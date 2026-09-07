@@ -72,6 +72,16 @@ playlog の MessageEvent として注入する。
 - **時刻・乱数など非決定な値を載せてはならない。** 全インスタンスが同一内容を受け取ることが前提
 - payload は JSON として直列化可能でなければならない
 
+### 4.1 playerId の id 空間
+
+payload がプレイヤーを指すときは、**実行基盤がそのコンテンツへ申告している playerId** を送る。コンテンツが `ev.player.id` や `g.game.selfId` で観測している値のことで、実行基盤の内部識別子（アカウント id、セッション id、cookie の値など）を送ってはならない。
+
+コンテンツは自分が観測した id としか照合できないので、これが唯一マッチする値になる。
+
+内部識別子をそのまま in-game playerId として配っている実行基盤では両者は一致するが、**一致するのは結果であって前提ではない**。たとえばゲストの内部 id を秘匿するために非可逆な派生値を in-game playerId として配る実行基盤では、通知にもその派生値を載せる。
+
+生の内部 id か派生値かは問わない。判断基準は「**コンテンツが観測している id と同じか**」だけ。
+
 ## 5. version
 
 `version` は **`type` ごとに独立**。ある拡張が v2 になっても、他の拡張は v1 のままでよい。拡張をまたいだ通し番号にはしない。
@@ -123,9 +133,11 @@ g.game.onMessage.add((ev) => {
 } // フィールド名も型も同じ。値の意味だけが変わった
 ```
 
-例: `playerId` を生の viewerId から、部屋ごとにスコープしたハッシュ id へ変える。
+例: `playerId` を、コンテンツが観測している playerId から、部屋ごとにスコープした別のハッシュ id へ変える。4.1 の id 空間そのものが変わっている。
 
 これを v1 のまま流すと、古いライブラリは知らない id を渡されて**誰にもマッチせず、追放が静かに効かなくなる**。例外もログも出ない。**名前も型も変わっていないのに壊れる**、これが version を上げる典型。
+
+逆に、実行基盤が in-game playerId の作り方を変え、通知の `playerId` もそれに追随しただけなら version は上げない。コンテンツから見れば `ev.player.id` と一致したままで、4.1 を満たし続けているため。**版を分けるのは id の作り方ではなく、コンテンツが観測している id と食い違うかどうか。**
 
 フィールドの削除、optional から必須への変更も同じ扱い。
 
@@ -135,7 +147,10 @@ g.game.onMessage.add((ev) => {
 
 ```ts
 sendEvent(
-  buildNotificationEvent(TYPE, 1, { action: "banned", playerId: rawViewerId }),
+  buildNotificationEvent(TYPE, 1, {
+    action: "banned",
+    playerId: observedPlayerId,
+  }),
 );
 sendEvent(
   buildNotificationEvent(TYPE, 2, { action: "banned", playerId: scopedId }),
@@ -156,7 +171,8 @@ sendEvent(
 拡張を受け入れる実行基盤は、次を満たさなければならない。
 
 1. **通知の注入**
-   確定した状態変化について `[32, 0, ":multi-indiegame", payload]` を playlog に注入し、active インスタンス経由で全インスタンスへ配ること。payload の組み立ては各拡張パッケージが提供する `buildNotificationEvent()` 系を使うこと
+   確定した状態変化について `[32, 0, ":multi-indiegame", payload]` を playlog に注入し、active インスタンス経由で全インスタンスへ配ること。payload の組み立ては各拡張パッケージが提供する `buildNotificationEvent()` 系を使うこと。
+   payload がプレイヤーを指すときは **4.1 の id 空間に従うこと**。コンテンツへ申告している playerId を送る
 
 2. **予約 playerId の拒否**
    クライアント由来のイベント送信について、`:` で始まる playerId を名乗るものを破棄すること。
