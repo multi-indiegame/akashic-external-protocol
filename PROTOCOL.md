@@ -90,7 +90,6 @@ playlog の MessageEvent として注入する。共通なのは `type` と `ver
 ```
 
 - `type` と `version` は全ての payload に必須
-- **時刻・乱数など非決定な値を載せてはならない。** 全インスタンスが同一内容を受け取ることが前提
 - payload は JSON として直列化可能でなければならない
 
 ### 4.1 playerId の id 空間
