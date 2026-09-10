@@ -116,7 +116,8 @@ payload がプレイヤーを指すときは、**実行基盤がそのコンテ�
 const TYPE = "@multi-indiegame/akashic-player-ban";
 const KNOWN_VERSION = 1;
 
-g.game.onMessage.add((ev) => {
+// scene は g.Scene インスタンス
+scene.onMessage.add((ev) => {
   if (ev.player?.id !== RESERVED_PLAYER_ID) return; // 偽装除け
   const d = ev.data;
   if (d?.type !== TYPE) return; // 他拡張宛
