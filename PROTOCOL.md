@@ -317,7 +317,7 @@ payload の組み立ては、各拡張パッケージが提供する `buildNotif
 | `@multi-indiegame/akashic-player-ban` | 1       | passive    | [akashic-player-ban](https://github.com/multi-indiegame/akashic-player-ban) | `playerBan`   |
 | —                                     | —       | active     | [akashic-scoreboard](https://github.com/multi-indiegame/akashic-scoreboard) | `scoreboard`  |
 
-**生える場所**は、その拡張が想定するインスタンスの役割。実行基盤の実装者が判断しやすいように書いてあるだけで、契約ではない。ここが `active` の拡張は、passive インスタンスでは `g.game.external.<key>` が無いのが通常であり、ライブラリは 7 章 1 のとおり no-op で degrade する。
+**生える場所**は、その拡張が想定するインスタンスの役割。実行基盤の実装者が判断しやすいように書いてあるだけで、契約ではない。ここが `active` の拡張は、**active の役割を持たないインスタンス**では `g.game.external.<key>` が無いのが通常であり、ライブラリは 7 章 1 のとおり no-op で degrade する。1 つのインスタンスが両方の役割を兼ねる場合、そのインスタンスは active でもあるので生やす側に含める（1 章）。
 
 実行基盤からコンテンツへの通知（MessageEvent の注入）を定めない拡張は `type` と `version` を持たない。その場合に適用される取り決めは 6 章と 7 章の但し書きのとおり。
 
