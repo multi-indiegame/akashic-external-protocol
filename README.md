@@ -18,8 +18,11 @@ Akashic のコンテンツ拡張は `g.game.external` にオブジェクトが�
 | type                                  | リポジトリ                                                                  | 内容                           |
 | ------------------------------------- | --------------------------------------------------------------------------- | ------------------------------ |
 | `@multi-indiegame/akashic-player-ban` | [akashic-player-ban](https://github.com/multi-indiegame/akashic-player-ban) | ゲーム進行からのプレイヤー追放 |
+| —                                     | [akashic-scoreboard](https://github.com/multi-indiegame/akashic-scoreboard) | プレイ記録の実行基盤への報告   |
 
-新しい拡張を足すときは、PROTOCOL.md の「拡張レジストリ」に 1 行足す。
+`type` は実行基盤からコンテンツへの通知の識別子なので、通知を定めない拡張は持たない（PROTOCOL.md 9 章）。
+
+新しい拡張を足すときは、PROTOCOL.md の「拡張レジストリ」とこの表に 1 行ずつ足す。
 
 ## ライセンス
 
